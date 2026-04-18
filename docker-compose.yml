@@ -1,0 +1,245 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # DATABASE – MLFlow backend store
+  # ==========================================
+  postgres:
+    image: postgres:13
+    container_name: ${USER}_cc-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mlflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mlflow}
+      POSTGRES_DB: ${POSTGRES_DB:-mlflow}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-mlflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cc-mlops
+
+  # ==========================================
+  # MINIO – S3-compatible artifact storage
+  # ==========================================
+  minio:
+    image: minio/minio:latest
+    container_name: ${USER}_cc-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cc-mlops
+
+  # ==========================================
+  # MINIO INIT – create default bucket
+  # ==========================================
+  minio-init:
+    image: minio/mc:latest
+    container_name: ${USER}_cc-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO...';
+      sleep 5;
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio123};
+      /usr/bin/mc mb myminio/${MINIO_BUCKET_NAME:-mlflow-artifacts} --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/${MINIO_BUCKET_NAME:-mlflow-artifacts};
+      echo 'Bucket ready!';
+      exit 0;
+      "
+    networks:
+      - cc-mlops
+
+  # ==========================================
+  # MLFLOW – experiment tracking & model registry
+  # ==========================================
+  mlflow:
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    container_name: ${USER}_cc-mlflow
+    environment:
+      - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER:-minio}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD:-minio123}
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - MLFLOW_S3_IGNORE_TLS=true
+      - POSTGRES_USER=${POSTGRES_USER:-mlflow}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-mlflow}
+      - POSTGRES_DB=${POSTGRES_DB:-mlflow}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-mlflow-artifacts}
+    volumes:
+      - mlflow_data:/mlflow
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://0.0.0.0:5000/health')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - cc-mlops
+
+  # ==========================================
+  # API – FastAPI model serving
+  # ==========================================
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ${USER}_cc-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MODEL_NAME=${MODEL_NAME:-credit_card_propensity}
+      - MODEL_STAGE=${MODEL_STAGE:-Production}
+      - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER:-minio}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD:-minio123}
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - MLFLOW_S3_IGNORE_TLS=true
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - cc-mlops
+    restart: unless-stopped
+
+  # ==========================================
+  # EVIDENTLY – drift & data quality monitoring
+  # ==========================================
+  evidently:
+    build:
+      context: ./evidently
+      dockerfile: Dockerfile
+    container_name: ${USER}_cc-evidently
+    ports:
+      - "${EVIDENTLY_PORT:-8001}:8001"
+    volumes:
+      - evidently_data:/app/data
+      - evidently_reports:/app/reports
+      - evidently_reference:/app/reference
+    environment:
+      - EVIDENTLY_DRIFT_THRESHOLD=${EVIDENTLY_DRIFT_THRESHOLD:-0.1}
+      - EVIDENTLY_MIN_SAMPLES=${EVIDENTLY_MIN_SAMPLES:-100}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cc-mlops
+    restart: unless-stopped
+
+  # ==========================================
+  # PROMETHEUS – metrics collection
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ${USER}_cc-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - evidently
+    networks:
+      - cc-mlops
+    restart: unless-stopped
+
+  # ==========================================
+  # GRAFANA – dashboards & visualization
+  # ==========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ${USER}_cc-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - cc-mlops
+    restart: unless-stopped
+
+# ==========================================
+# VOLUMES
+# ==========================================
+volumes:
+  postgres_data:
+    driver: local
+    name: ${USER}_cc-postgres_data
+  minio_data:
+    driver: local
+    name: ${USER}_cc-minio_data
+  mlflow_data:
+    driver: local
+    name: ${USER}_cc-mlflow_data
+  prometheus_data:
+    driver: local
+    name: ${USER}_cc-prometheus_data
+  grafana_data:
+    driver: local
+    name: ${USER}_cc-grafana_data
+  evidently_data:
+    driver: local
+    name: ${USER}_cc-evidently_data
+  evidently_reports:
+    driver: local
+    name: ${USER}_cc-evidently_reports
+  evidently_reference:
+    driver: local
+    name: ${USER}_cc-evidently_reference
+
+# ==========================================
+# NETWORKS
+# ==========================================
+networks:
+  cc-mlops:
+    driver: bridge
