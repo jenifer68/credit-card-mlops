@@ -171,7 +171,18 @@ def simulate(n: int = 100, drift: bool = False, delay: float = 0.05):
         r.raise_for_status()
         info = r.json()
         model_version = info.get("model_version", "unknown")
+        model_loaded = bool(info.get("model_loaded", False))
+        status = str(info.get("status", "unknown"))
         logger.info("API ready | model_version=%s", model_version)
+        if not model_loaded or status != "healthy":
+            logger.error(
+                "API is reachable but model is not loaded (status=%s, model_loaded=%s). "
+                "Run: curl.exe -X POST %s/model/reload",
+                status,
+                model_loaded,
+                API_URL,
+            )
+            sys.exit(1)
     except Exception as exc:
         logger.error("API not reachable at %s: %s", API_URL, exc)
         sys.exit(1)

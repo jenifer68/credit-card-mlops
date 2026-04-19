@@ -46,6 +46,15 @@ FEATURE_NAMES = [
     "low_balance_flag", "active_txn_flag",
 ]
 
+INT_FEATURES = {
+    "age",
+    "gender",
+    "eligible_by_age",
+    "high_spend_flag",
+    "low_balance_flag",
+    "active_txn_flag",
+}
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -208,6 +217,9 @@ class ModelManager:
 
         import pandas as pd
         df = pd.DataFrame([features], columns=FEATURE_NAMES)
+        for col in INT_FEATURES:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).round().astype("int64")
 
         t0 = time.time()
         raw = self.model.predict(df)

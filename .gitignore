@@ -1,0 +1,138 @@
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-wheel-metadata/
+.installed.cfg
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# ============================================================
+# Environment / Secrets
+# ============================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# ============================================================
+# Data files (large, không push lên GitHub)
+# ============================================================
+data/raw/
+data/processed/
+data/reference/
+*.csv
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# Cho phép file nhỏ trong thư mục data nếu cần
+!data/.gitkeep
+!data/raw/.gitkeep
+
+# ============================================================
+# MLflow artifacts (lưu trên MinIO, không cần push)
+# ============================================================
+mlruns/
+mlartifacts/
+mlflow.db
+
+# ============================================================
+# Evidently reports (HTML sinh ra lúc runtime)
+# ============================================================
+evidently/reports/
+reports/
+*.html
+
+# ============================================================
+# Docker volumes & local state
+# ============================================================
+postgres-data/
+minio-data/
+grafana-data/
+prometheus-data/
+
+# ============================================================
+# Model files
+# ============================================================
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.cbm
+*.bin
+*.model
+output/
+models/
+
+# ============================================================
+# Jupyter Notebooks checkpoints
+# ============================================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================================
+# IDE / Editor
+# ============================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Logs
+# ============================================================
+*.log
+logs/
+
+# ============================================================
+# Test & Coverage
+# ============================================================
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+nosetests.xml
+test-results/
+
+# ============================================================
+# CI/CD cache
+# ============================================================
+.cache/
+.mypy_cache/
+.ruff_cache/
