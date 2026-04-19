@@ -41,9 +41,13 @@ MODEL_NAME = os.getenv("MODEL_NAME", "credit_card_propensity")
 EXPERIMENT_NAME = "credit_card_propensity_experiment"
 
 # Paths to feature-engineered data
+# DATA_DIR = os.getenv(
+#     "DATA_DIR",
+#     os.path.join(os.path.dirname(__file__), "..", "data", "raw", "Dataset"),
+# )
 DATA_DIR = os.getenv(
     "DATA_DIR",
-    os.path.join(os.path.dirname(__file__), "..", "data", "raw", "Dataset"),
+    os.path.join(os.path.dirname(__file__), "..", "data", "raw", "dataset_new"),
 )
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "model_outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
