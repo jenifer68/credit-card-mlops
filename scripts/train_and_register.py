@@ -146,25 +146,25 @@ with mlflow.start_run(run_name="LightGBM_champion") as run:
     )
 
     pred_valid = model.predict(X_valid, num_iteration=model.best_iteration)
-    pred_test  = model.predict(X_test,  num_iteration=model.best_iteration)
+    pred_test = model.predict(X_test, num_iteration=model.best_iteration)
 
     # Validation metrics
-    auc_valid  = roc_auc_score(y_valid, pred_valid)
-    ks_valid   = ks_stat(y_valid, pred_valid)
+    auc_valid = roc_auc_score(y_valid, pred_valid)
+    ks_valid = ks_stat(y_valid, pred_valid)
     lift_valid = lift_at_k(y_valid, pred_valid)
 
     # Test metrics
-    auc_test  = roc_auc_score(y_test, pred_test)
-    ks_test   = ks_stat(y_test, pred_test)
+    auc_test = roc_auc_score(y_test, pred_test)
+    ks_test = ks_stat(y_test, pred_test)
     lift_test = lift_at_k(y_test, pred_test)
 
     mlflow.log_metrics({
-        "valid_auc":    round(auc_valid, 6),
-        "valid_ks":     round(ks_valid, 6),
+        "valid_auc": round(auc_valid, 6),
+        "valid_ks": round(ks_valid, 6),
         "valid_lift10": round(lift_valid, 6),
-        "test_auc":     round(auc_test, 6),
-        "test_ks":      round(ks_test, 6),
-        "test_lift10":  round(lift_test, 6),
+        "test_auc": round(auc_test, 6),
+        "test_ks": round(ks_test, 6),
+        "test_lift10": round(lift_test, 6),
         "best_iteration": model.best_iteration,
     })
 
@@ -255,7 +255,7 @@ print("  TRAINING COMPLETE")
 print("=" * 60)
 print(f"  Model     : {MODEL_NAME}")
 print(f"  Version   : {latest}")
-print(f"  Stage     : Production")
+print("  Stage     : Production")
 print(f"  Valid AUC : {auc_valid:.4f}")
 print(f"  Valid KS  : {ks_valid:.4f}")
 print(f"  Test AUC  : {auc_test:.4f}")
