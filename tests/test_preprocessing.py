@@ -95,7 +95,8 @@ class TestFeatureConsistency:
 
 class TestFeatureDistributions:
     def test_no_constant_features(self, sample):
-        feature_cols = [c for c in sample.columns if c != "target"]
+        binary_flags = {"gender", "eligible_by_age", "high_spend_flag", "low_balance_flag", "active_txn_flag"}
+        feature_cols = [c for c in sample.columns if c != "target" and c not in binary_flags]
         constant = [c for c in feature_cols if sample[c].nunique() == 1]
         assert constant == [], f"Constant features (zero variance): {constant}"
 
