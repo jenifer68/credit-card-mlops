@@ -1,8 +1,8 @@
-# Credit Card MLOps – Dự Đoán Mở Thẻ Tín Dụng
+# MLOps: From Model to Productions – Dự đoán khách hàng tiềm năng mở thẻ tín dụng Ngân hàng
 
 **DDM501 Final Project – FSB32-Minh Ha**
 
-Hệ thống MLOps đầy đủ cho bài toán dự đoán khách hàng có khả năng mở thẻ tín dụng (Credit Card Propensity Scoring).
+Hệ thống MLOps đầy đủ cho bài toán Dự đoán khách hàng tiềm năng mở thẻ tín dụng (Credit Card Propensity Scoring).
 
 ---
 
