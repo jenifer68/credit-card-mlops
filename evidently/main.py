@@ -12,17 +12,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-import numpy as np
 import pandas as pd
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from starlette.responses import Response
 
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset, DataQualityPreset
-from evidently.metrics import DatasetDriftMetric
 
 from prometheus_client import (
     Counter, Gauge, Histogram,

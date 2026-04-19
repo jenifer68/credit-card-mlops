@@ -7,14 +7,13 @@ import os
 import time
 import logging
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Optional
 
 import numpy as np
 import mlflow
 import mlflow.pyfunc
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from starlette.responses import Response
 
@@ -132,12 +131,14 @@ class PredictionRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "features": [46, 1, 8.32, 3310613.69, 3367367.83, 2348056.57,
-                              3053211.37, 3847988.53, 7404976.06, 13258901.81,
-                              78920973.24, 119569150.41, 48365930.36, 70.93,
-                              2950061.74, 1766109.95, 1.26, 0.61, 5853925.75,
-                              0.29, 0.41, 0.35, 0.98, 0.70, 1.64,
-                              40648177.18, 0.61, 13.64, 13.35, 1, 1, 0, 1],
+                "features": [
+                    46, 1, 8.32, 3310613.69, 3367367.83, 2348056.57,
+                    3053211.37, 3847988.53, 7404976.06, 13258901.81,
+                    78920973.24, 119569150.41, 48365930.36, 70.93,
+                    2950061.74, 1766109.95, 1.26, 0.61, 5853925.75,
+                    0.29, 0.41, 0.35, 0.98, 0.70, 1.64,
+                    40648177.18, 0.61, 13.64, 13.35, 1, 1, 0, 1
+                ],
                 "feature_names": ["age", "gender", "tenure_to_bank", "..."],
             }
         }
