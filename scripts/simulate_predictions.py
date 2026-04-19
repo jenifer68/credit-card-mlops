@@ -9,7 +9,6 @@
 # ============================================================
 
 import argparse
-import json
 import os
 import random
 import sys
@@ -92,32 +91,32 @@ def make_synthetic_row() -> list:
         random.randint(0, 1),                  # gender
         random.uniform(1, 20),                 # tenure_to_bank
         random.uniform(100_000, 5_000_000),    # avg_casa_this_m
-        random.uniform(100_000, 4_000_000),    # avg_bal_amt_6mtd_fcy_casa
-        random.uniform(100_000, 3_500_000),    # avg_bal_amt_ytd_fcy_casa
-        random.uniform(500_000, 8_000_000),    # cr_amt_mtd_fcy_casa
-        random.uniform(500_000, 9_000_000),    # dr_amt_mtd_fcy_casa
-        random.uniform(1_000_000, 15_000_000), # cr_amt_qtd_fcy_casa
-        random.uniform(1_000_000, 18_000_000), # dr_amt_qtd_fcy_casa
-        random.uniform(20_000_000, 200_000_000), # avg_loan_lmt
-        random.uniform(30_000_000, 300_000_000), # max_loan_lmt
-        random.uniform(10_000_000, 100_000_000), # max_loan_dsbr_amt
-        random.uniform(12, 120),               # avg_loan_duration
-        random.uniform(100_000, 4_000_000),    # avg_td_last_2m
-        random.uniform(100_000, 3_000_000),    # sum_td_this_m
-        random.uniform(0.5, 3.5),              # debit_credit_ratio
-        random.uniform(0.1, 1.5),              # cash_pressure
-        random.uniform(100_000, 8_000_000),    # pressure_score
-        random.uniform(0.1, 0.6),              # spend_velocity
-        random.uniform(0.1, 0.6),              # txn_velocity
-        random.uniform(0.2, 0.5),              # momentum_score
-        random.uniform(0.5, 1.5),              # casa_trend
-        random.uniform(0.5, 2.0),              # balance_change_ratio
-        random.uniform(0.5, 2.0),              # utilization_ratio
-        random.uniform(5_000_000, 150_000_000), # loan_gap
-        random.uniform(0.3, 0.8),              # loan_pressure_ratio
-        random.uniform(5, 30),                 # tenure_x_util
-        random.uniform(5, 30),                 # age_x_spend
-        random.randint(0, 1),                  # eligible_by_age
+        random.uniform(100_000, 4_000_000),  # avg_bal_amt_6mtd_fcy_casa
+        random.uniform(100_000, 3_500_000),  # avg_bal_amt_ytd_fcy_casa
+        random.uniform(500_000, 8_000_000),  # cr_amt_mtd_fcy_casa
+        random.uniform(500_000, 9_000_000),  # dr_amt_mtd_fcy_casa
+        random.uniform(1_000_000, 15_000_000),  # cr_amt_qtd_fcy_casa
+        random.uniform(1_000_000, 18_000_000),  # dr_amt_qtd_fcy_casa
+        random.uniform(20_000_000, 200_000_000),  # avg_loan_lmt
+        random.uniform(30_000_000, 300_000_000),  # max_loan_lmt
+        random.uniform(10_000_000, 100_000_000),  # max_loan_dsbr_amt
+        random.uniform(12, 120),  # avg_loan_duration
+        random.uniform(100_000, 4_000_000),  # avg_td_last_2m
+        random.uniform(100_000, 3_000_000),  # sum_td_this_m
+        random.uniform(0.5, 3.5),  # debit_credit_ratio
+        random.uniform(0.1, 1.5),  # cash_pressure
+        random.uniform(100_000, 8_000_000),  # pressure_score
+        random.uniform(0.1, 0.6),  # spend_velocity
+        random.uniform(0.1, 0.6),  # txn_velocity
+        random.uniform(0.2, 0.5),  # momentum_score
+        random.uniform(0.5, 1.5),  # casa_trend
+        random.uniform(0.5, 2.0),  # balance_change_ratio
+        random.uniform(0.5, 2.0),  # utilization_ratio
+        random.uniform(5_000_000, 150_000_000),  # loan_gap
+        random.uniform(0.3, 0.8),  # loan_pressure_ratio
+        random.uniform(5, 30),  # tenure_x_util
+        random.uniform(5, 30),  # age_x_spend
+        random.randint(0, 1),  # eligible_by_age
         random.randint(0, 1),                  # high_spend_flag
         random.randint(0, 1),                  # low_balance_flag
         random.randint(0, 1),                  # active_txn_flag

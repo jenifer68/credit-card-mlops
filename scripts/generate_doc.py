@@ -1219,11 +1219,12 @@ for i, s in enumerate(next_steps, 1):
     add_bullet(doc, f"{i}. {s}")
 
 doc.add_paragraph()
-add_para(doc,
+add_para(
+    doc,
     "Dự án đã xây dựng thành công một hệ thống MLOps production-ready cho bài toán dự đoán mở thẻ tín dụng, "
     "từ data pipeline, model training, serving, monitoring đến Responsible AI. "
     "Hệ thống đáp ứng đầy đủ yêu cầu của DDM501 Final Project và có thể triển khai thực tế tại ngân hàng.",
-    bold=False
+    bold=False,
 )
 
 # ============================================================

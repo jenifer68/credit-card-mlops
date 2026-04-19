@@ -1,6 +1,6 @@
 # ============================================================
 # Credit Card MLOps – Train & Register LightGBM Champion
-# 
+#
 # Run AFTER infrastructure is up:
 #   python scripts/train_and_register.py
 #
@@ -82,11 +82,11 @@ logger.info("Loading data from: %s", DATA_DIR)
 
 train = pd.read_csv(os.path.join(DATA_DIR, "card_train_fe.csv"))
 valid = pd.read_csv(os.path.join(DATA_DIR, "card_valid_fe.csv"))
-test  = pd.read_csv(os.path.join(DATA_DIR, "card_test_fe.csv"))
+test = pd.read_csv(os.path.join(DATA_DIR, "card_test_fe.csv"))
 
 X_train, y_train = train.drop(columns=[TARGET]), train[TARGET]
 X_valid, y_valid = valid.drop(columns=[TARGET]), valid[TARGET]
-X_test,  y_test  = test.drop(columns=[TARGET]),  test[TARGET]
+X_test, y_test = test.drop(columns=[TARGET]), test[TARGET]
 
 logger.info("Train : %s  |  target_rate=%.4f", train.shape, y_train.mean())
 logger.info("Valid : %s  |  target_rate=%.4f", valid.shape, y_valid.mean())
