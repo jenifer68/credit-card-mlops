@@ -34,12 +34,12 @@ python scripts/simulate_predictions.py --upload-reference --n 200
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| Grafana | http://localhost:3000 | admin/admin |
+| Grafana | http://localhost:3000 | admin/****** |
 | MLflow | http://localhost:5000 | – |
 | API Docs | http://localhost:8000/docs | – |
 | Evidently | http://localhost:8001 | – |
 | Prometheus | http://localhost:9090 | – |
-| MinIO | http://localhost:9001 | minio/minio123 |
+| MinIO | http://localhost:9001 | minio/****** |
 
 ## Documentation
 
